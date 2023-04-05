@@ -4,11 +4,6 @@ export default class revealExplorerFile extends Plugin {
 	async onload() {
 		this.app.workspace.onLayoutReady(() => {
 			this.reveal();
-			this.registerEvent(
-				this.app.workspace.on("active-leaf-change", () => {
-					this.reveal();
-				})
-			);
 		});
 	}
 
