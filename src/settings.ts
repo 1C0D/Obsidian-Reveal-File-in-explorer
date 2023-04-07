@@ -45,7 +45,7 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Reveal on file-open")
-			.setDesc("When opening a file it will reveal it")
+			.setDesc("When opening a file, it will reveal it")
 			.addToggle((toggle) => {
 				toggle
 					// Create a toggle for the setting
@@ -58,7 +58,7 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 			});
 		new Setting(containerEl)
 			.setName("Fold when open")
-			.setDesc("When opening a file it will fold other folders too")
+			.setDesc("When opening a file, it will also fold other folders")
 			.addToggle((toggle) => {
 				toggle
 					// Create a toggle for the setting
