@@ -54,14 +54,20 @@ export default class revealExplorerFile extends Plugin {
 			await (this.app as any).commands.executeCommandById(
 				"file-explorer:reveal-active-file"
 			);
-			const activeLeaf = (workspace as any).activeLeaf;
-			if (activeLeaf) {
-				workspace.revealLeaf(activeLeaf);
-				const el = activeView?.containerEl.firstChild; // viewheader
-				const title = (
-					activeView?.containerEl.firstChild as Element
-				)?.querySelector(".view-header-title");
-			}
+			
+			// get back focus on title. because left and right arrow not working. All what I tried Not working...
+			// const activeLeaf = (workspace as any).activeLeaf;
+			// if (activeLeaf) {
+			// 	workspace.revealLeaf(activeLeaf);
+			// 	const title = (
+			// 		activeView?.containerEl.firstChild as Element
+			// 	)?.querySelector(".view-header-title") as HTMLInputElement;
+			// 	title.classList.add(
+			// 		"is-focused",
+			// 		// "workspace-leaf",
+			// 		"mod-active"
+			// 	);
+			// }
 		}
 	};
 
