@@ -25,9 +25,10 @@ export default class revealExplorerFile extends Plugin {
 	}
 
 	reveal = () => {
-		const containerEl = this.app.workspace.containerEl.win; //win to work on multi windows
+		const { workspace } = this.app;
+		const containerEl = workspace.containerEl.win; //win to work on multi windows
 		this.registerDomEvent(containerEl, "click", this.clickHandler);
-		this.app.workspace.on("file-open", async () => {
+		workspace.on("file-open", async () => {
 			if (this.settings.revealOnOpen) {
 				if (this.settings.foldWhenOPen) this.fold();
 				await (this.app as any).commands.executeCommandById(
@@ -39,11 +40,13 @@ export default class revealExplorerFile extends Plugin {
 
 	clickHandler = async (evt: any) => {
 		if (evt.target.classList.contains("view-header-title")) {
+			if (!this.isFileExplorerActive()) return;
+
 			// don't trigger on New tab
 			const { workspace } = this.app;
 			const activeView = workspace.getActiveViewOfType(View);
 			const isNewTab = activeView?.getDisplayText() === "New tab";
-			if (isNewTab) return
+			if (isNewTab) return;
 
 			if (this.settings.foldOtherDirsBefore) {
 				this.fold();
@@ -51,6 +54,14 @@ export default class revealExplorerFile extends Plugin {
 			await (this.app as any).commands.executeCommandById(
 				"file-explorer:reveal-active-file"
 			);
+			const activeLeaf = (workspace as any).activeLeaf;
+			if (activeLeaf) {
+				workspace.revealLeaf(activeLeaf);
+				const el = activeView?.containerEl.firstChild; // viewheader
+				const title = (
+					activeView?.containerEl.firstChild as Element
+				)?.querySelector(".view-header-title");
+			}
 		}
 	};
 
@@ -75,6 +86,15 @@ export default class revealExplorerFile extends Plugin {
 			}
 		}
 	};
+
+	//seeking for <div class="workspace-tab-header is-active" draggable="true" aria-label="Files" aria-label-delay="300" data-type="file-explorer">
+	// so elts <div> with attr data-type = "file-explorer" and with a class "is-active".
+	isFileExplorerActive(): boolean {
+		const el = document.querySelector(
+			'div[data-type="file-explorer"].is-active'
+		);
+		return el !== null;
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(
