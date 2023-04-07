@@ -1,8 +1,9 @@
 # Reveal File in Explorer  
   
-reveal active file in explorer by clicking on the header title (works on several windows)
+This plugin allows you to reveal the active file in the explorer by clicking on the header title. It works on several windows.
 
 Settings:  
-Option to fold all folders where the revealed file is not in
+- Option to fold all folders except the one containing the active file 
+- More options to reveal when opening files
   
 ![demo](demo.jpg)

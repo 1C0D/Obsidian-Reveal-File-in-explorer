@@ -42,5 +42,32 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 						this.plugin.saveSettings();
 					});
 			});
+
+		new Setting(containerEl)
+			.setName("Reveal on file-open")
+			.setDesc("When opening a file it will reveal it")
+			.addToggle((toggle) => {
+				toggle
+					// Create a toggle for the setting
+					.setValue(this.plugin.settings.revealOnOpen)
+					.onChange((value) => {
+						// Update the plugin setting when the toggle is changed
+						this.plugin.settings.revealOnOpen = value;
+						this.plugin.saveSettings();
+					});
+			});
+		new Setting(containerEl)
+			.setName("Fold when open")
+			.setDesc("When opening a file it will fold other folders too")
+			.addToggle((toggle) => {
+				toggle
+					// Create a toggle for the setting
+					.setValue(this.plugin.settings.foldWhenOPen)
+					.onChange((value) => {
+						// Update the plugin setting when the toggle is changed
+						this.plugin.settings.foldWhenOPen = value;
+						this.plugin.saveSettings();
+					});
+			});
 	}
 }
