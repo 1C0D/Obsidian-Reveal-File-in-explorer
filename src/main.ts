@@ -54,7 +54,7 @@ export default class revealExplorerFile extends Plugin {
 			await (this.app as any).commands.executeCommandById(
 				"file-explorer:reveal-active-file"
 			);
-			
+
 			// get back focus on title. because left and right arrow not working. All what I tried Not working...
 			// const activeLeaf = (workspace as any).activeLeaf;
 			// if (activeLeaf) {
@@ -72,6 +72,10 @@ export default class revealExplorerFile extends Plugin {
 	};
 
 	fold = async () => {
+		const { workspace } = this.app;
+		const activeLeaf = (workspace as any).activeLeaf;
+		const activeView = activeLeaf.view;
+		if (activeView?.getDisplayText() === "New tab") return;
 		const fileExplorer = this.app.workspace
 			.getLeavesOfType("file-explorer")
 			?.first();
