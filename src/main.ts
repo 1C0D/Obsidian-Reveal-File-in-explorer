@@ -37,7 +37,7 @@ export default class revealExplorerFile extends Plugin {
 					!(activeView as any).sourceMode ||
 					!(activeView as any).sourceMode.cmEditor
 				) {
-					console.log("No active leaf view");
+					// console.log("No active leaf view");
 					return;
 				}
 				const cmEditor = (activeView as any)?.sourceMode.cmEditor;
@@ -52,15 +52,12 @@ export default class revealExplorerFile extends Plugin {
 					"editor:focus"
 				);
 
-				console.log(
-					"activeView?.containerEl?",
-					activeView?.containerEl
-				);
+
 				const titleContainerEl =
 					activeView?.containerEl?.querySelector(
 						".view-header-title"
 					);
-				console.log("titleContainerEl", titleContainerEl);
+				
 				if (titleContainerEl instanceof HTMLElement) {
 					setTimeout(() => {
 						titleContainerEl.focus();
