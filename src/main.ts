@@ -42,7 +42,7 @@ export default class revealExplorerFile extends Plugin {
 				const cmEditor = (activeView as any)?.sourceMode.cmEditor;
 				const cursor = cmEditor.getCursor();
 
-				if (this.settings.foldWhenOpen) this.fold();
+				if (this.settings.foldWhenOpen) await this.fold();
 				await (this.app as any).commands.executeCommandById(
 					"file-explorer:reveal-active-file"
 				);
@@ -77,7 +77,7 @@ export default class revealExplorerFile extends Plugin {
 			if (isNewTab) return;
 
 			if (this.settings.foldOtherDirsBefore) {
-				this.fold();
+				await this.fold();
 			}
 			await (this.app as any).commands.executeCommandById(
 				"file-explorer:reveal-active-file"
