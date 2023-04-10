@@ -30,20 +30,19 @@ export default class revealExplorerFile extends Plugin {
 		this.registerDomEvent(containerEl, "click", this.clickHandler);
 		workspace.on("file-open", async () => {
 			if (this.settings.revealOnOpen) {
-				const activeView = workspace.getActiveViewOfType(View);
 				if (!this.is_file_explorer_open()) return;
+				const activeView = workspace.getActiveViewOfType(View);
 				if (
 					!activeView ||
 					!(activeView as any).sourceMode ||
 					!(activeView as any).sourceMode.cmEditor
 				) {
-					// console.log("No active leaf view");
 					return;
 				}
 				const cmEditor = (activeView as any)?.sourceMode.cmEditor;
 				const cursor = cmEditor.getCursor();
 
-				if (this.settings.foldWhenOpen) await this.fold();
+				if (this.settings.foldWhenOpen) this.fold();
 				await (this.app as any).commands.executeCommandById(
 					"file-explorer:reveal-active-file"
 				);
@@ -59,11 +58,11 @@ export default class revealExplorerFile extends Plugin {
 					);
 				
 				if (titleContainerEl instanceof HTMLElement) {
-					setTimeout(() => {
+					setTimeout(async() => {
 						titleContainerEl.focus();
 						cmEditor.setCursor(cursor);
 						cmEditor.focus();
-					}, 100);
+					}, 50);
 				}
 			}
 		});
@@ -96,15 +95,14 @@ export default class revealExplorerFile extends Plugin {
 
 	fold = async () => {
 		const { workspace } = this.app;
-		const activeLeaf = (workspace as any).activeLeaf;
-		const activeView = activeLeaf.view;
-		if (activeView?.getDisplayText() === "New tab") return;
-		const fileExplorer = this.app.workspace
+		const fileExplorer = workspace
 			.getLeavesOfType("file-explorer")
 			?.first();
 		if (!fileExplorer) {
 			return;
 		}
+		const activeView = workspace.getActiveViewOfType(View);
+		if (activeView?.getDisplayText() === "New tab") return;
 
 		function isFolder(file: TFile | TFolder): file is TFolder {
 			return file instanceof TFolder;
@@ -115,7 +113,7 @@ export default class revealExplorerFile extends Plugin {
 			// Collapse folder
 			const isFold = isFolder((fileItem as any).file);
 			if (isFold) {
-				(fileItem as any).setCollapsed(true);
+				await (fileItem as any).setCollapsed(true);
 			}
 		}
 	};

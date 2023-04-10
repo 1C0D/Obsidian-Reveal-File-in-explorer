@@ -27,10 +27,9 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 		linkContainer.appendChild(linkText);
 
 		new Setting(containerEl)
-			.setName("Fold other folders before")
+			.setName("Fold when clicking title")
 			.setDesc(
-				"This is closing all folders where the file is not in" +
-					" to improve visibility"
+				"When clicking title, close all folders where the file is not in"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -44,7 +43,7 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName("Reveal on file-open")
+			.setName("Reveal when opening file")
 			.setDesc("When opening a file, it will reveal it")
 			.addToggle((toggle) => {
 				toggle
@@ -57,15 +56,15 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 					});
 			});
 		new Setting(containerEl)
-			.setName("Fold when open")
+			.setName("Fold when opening file")
 			.setDesc("When opening a file, it will also fold other folders")
 			.addToggle((toggle) => {
 				toggle
 					// Create a toggle for the setting
-					.setValue(this.plugin.settings.foldWhenOPen)
+					.setValue(this.plugin.settings.foldWhenOpen)
 					.onChange((value) => {
 						// Update the plugin setting when the toggle is changed
-						this.plugin.settings.foldWhenOPen = value;
+						this.plugin.settings.foldWhenOpen = value;
 						this.plugin.saveSettings();
 					});
 			});
