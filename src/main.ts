@@ -4,13 +4,13 @@ import { revealExplorerFileSettingsTab } from "./settings";
 interface revealExplorerFileSettings {
 	foldOtherDirsBefore: boolean;
 	revealOnOpen: boolean;
-	foldWhenOPen: boolean;
+	foldWhenOpen: boolean;
 }
 
 const DEFAULT_SETTINGS: revealExplorerFileSettings = {
 	foldOtherDirsBefore: true,
 	revealOnOpen: false,
-	foldWhenOPen: false,
+	foldWhenOpen: false,
 };
 
 export default class revealExplorerFile extends Plugin {
@@ -27,15 +27,47 @@ export default class revealExplorerFile extends Plugin {
 	reveal = () => {
 		const { workspace } = this.app;
 		const containerEl = workspace.containerEl.win; //win to work on multi windows
-		if (!this.is_file_explorer_open()) return;
-		// if (!this.isFileExplorerActive()) return;
 		this.registerDomEvent(containerEl, "click", this.clickHandler);
 		workspace.on("file-open", async () => {
 			if (this.settings.revealOnOpen) {
-				if (this.settings.foldWhenOPen) this.fold();
+				const activeView = workspace.getActiveViewOfType(View);
+				if (!this.is_file_explorer_open()) return;
+				if (
+					!activeView ||
+					!(activeView as any).sourceMode ||
+					!(activeView as any).sourceMode.cmEditor
+				) {
+					console.log("No active leaf view");
+					return;
+				}
+				const cmEditor = (activeView as any)?.sourceMode.cmEditor;
+				const cursor = cmEditor.getCursor();
+
+				if (this.settings.foldWhenOpen) await this.fold();
 				await (this.app as any).commands.executeCommandById(
 					"file-explorer:reveal-active-file"
 				);
+
+				await (this.app as any).commands.executeCommandById(
+					"editor:focus"
+				);
+
+				console.log(
+					"activeView?.containerEl?",
+					activeView?.containerEl
+				);
+				const titleContainerEl =
+					activeView?.containerEl?.querySelector(
+						".view-header-title"
+					);
+				console.log("titleContainerEl", titleContainerEl);
+				if (titleContainerEl instanceof HTMLElement) {
+					setTimeout(() => {
+						titleContainerEl.focus();
+						cmEditor.setCursor(cursor);
+						cmEditor.focus();
+					}, 100);
+				}
 			}
 		});
 	};
@@ -54,6 +86,14 @@ export default class revealExplorerFile extends Plugin {
 			await (this.app as any).commands.executeCommandById(
 				"file-explorer:reveal-active-file"
 			);
+
+			await (this.app as any).commands.executeCommandById("editor:focus");
+
+			const titleContainerEl =
+				activeView?.containerEl?.querySelector(".view-header-title");
+			if (titleContainerEl instanceof HTMLElement) {
+				setTimeout(() => titleContainerEl.focus(), 50);
+			}
 		}
 	};
 
