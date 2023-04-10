@@ -27,6 +27,8 @@ export default class revealExplorerFile extends Plugin {
 	reveal = () => {
 		const { workspace } = this.app;
 		const containerEl = workspace.containerEl.win; //win to work on multi windows
+		if (!this.is_file_explorer_open()) return;
+		// if (!this.isFileExplorerActive()) return;
 		this.registerDomEvent(containerEl, "click", this.clickHandler);
 		workspace.on("file-open", async () => {
 			if (this.settings.revealOnOpen) {
@@ -39,9 +41,7 @@ export default class revealExplorerFile extends Plugin {
 	};
 
 	clickHandler = async (evt: any) => {
-		if (evt.target.classList.contains("view-header-title")) {
-			if (!this.isFileExplorerActive()) return;
-
+		if (evt.target?.classList.contains("view-header-title")) {
 			// don't trigger on New tab
 			const { workspace } = this.app;
 			const activeView = workspace.getActiveViewOfType(View);
@@ -54,20 +54,6 @@ export default class revealExplorerFile extends Plugin {
 			await (this.app as any).commands.executeCommandById(
 				"file-explorer:reveal-active-file"
 			);
-
-			// get back focus on title. because left and right arrow not working. All what I tried Not working...
-			// const activeLeaf = (workspace as any).activeLeaf;
-			// if (activeLeaf) {
-			// 	workspace.revealLeaf(activeLeaf);
-			// 	const title = (
-			// 		activeView?.containerEl.firstChild as Element
-			// 	)?.querySelector(".view-header-title") as HTMLInputElement;
-			// 	title.classList.add(
-			// 		"is-focused",
-			// 		// "workspace-leaf",
-			// 		"mod-active"
-			// 	);
-			// }
 		}
 	};
 
@@ -99,11 +85,26 @@ export default class revealExplorerFile extends Plugin {
 
 	//seeking for <div class="workspace-tab-header is-active" draggable="true" aria-label="Files" aria-label-delay="300" data-type="file-explorer">
 	// so elts <div> with attr data-type = "file-explorer" and with a class "is-active".
-	isFileExplorerActive(): boolean {
-		const el = document.querySelector(
-			'div[data-type="file-explorer"].is-active'
-		);
-		return el !== null;
+	// isFileExplorerActive(): boolean {
+	// 	const el = document.querySelector(
+	// 		'div[data-type="file-explorer"].is-active'
+	// 	);
+	// 	return el !== null;
+	// }
+
+	//better https://github.com/shichongrui/obsidian-reveal-active-file/blob/master/main.ts
+	is_file_explorer_open(): boolean {
+		const workspace = this.app.workspace;
+		let is_open = false;
+		workspace.iterateAllLeaves((leaf) => {
+			if (
+				leaf.getViewState().type == "file-explorer" &&
+				(leaf as any).width > 0
+			) {
+				is_open = true;
+			}
+		});
+		return is_open;
 	}
 
 	async loadSettings() {
