@@ -8,6 +8,3 @@ Settings:
 - More options to reveal when opening files
 
 ![demo](demo.jpg)
-
-N.B: letArrow and rightArrow won't work on the title header.  
-Prefer the inLine title to edit main title (the blue one on the picture)
