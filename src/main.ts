@@ -9,8 +9,8 @@ interface revealExplorerFileSettings {
 
 const DEFAULT_SETTINGS: revealExplorerFileSettings = {
 	foldOtherDirsBefore: true,
-	revealOnOpen: false,
-	foldWhenOpen: false,
+	revealOnOpen: true,
+	foldWhenOpen: true,
 };
 
 export default class revealExplorerFile extends Plugin {
