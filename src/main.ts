@@ -9,8 +9,8 @@ interface revealExplorerFileSettings {
 
 const DEFAULT_SETTINGS: revealExplorerFileSettings = {
 	foldOtherDirsBefore: true,
-	revealOnOpen: true,
-	foldWhenOpen: true,
+	revealOnOpen: false,
+	foldWhenOpen: false,
 };
 
 export default class revealExplorerFile extends Plugin {
@@ -20,7 +20,6 @@ export default class revealExplorerFile extends Plugin {
 		await this.loadSettings();
 		this.addSettingTab(new revealExplorerFileSettingsTab(this.app, this));
 		this.app.workspace.onLayoutReady(() => {
-			// this.registerEvent(
 			this.reveal();
 		});
 	}
@@ -47,19 +46,24 @@ export default class revealExplorerFile extends Plugin {
 				await (this.app as any).commands.executeCommandById(
 					"file-explorer:reveal-active-file"
 				);
+				// apparently the reveal fails sometime
+				setTimeout(async () => {
+					await (this.app as any).commands.executeCommandById(
+						"file-explorer:reveal-active-file"
+					);
+				}, 50);
 
-				await (this.app as any).commands.executeCommandById(
+				await(this.app as any).commands.executeCommandById(
 					"editor:focus"
 				);
-
 
 				const titleContainerEl =
 					activeView?.containerEl?.querySelector(
 						".view-header-title"
 					);
-				
+
 				if (titleContainerEl instanceof HTMLElement) {
-					setTimeout(async() => {
+					setTimeout(async () => {
 						titleContainerEl.focus();
 						cmEditor.setCursor(cursor);
 						cmEditor.focus();
