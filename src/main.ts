@@ -47,28 +47,26 @@ export default class revealExplorerFile extends Plugin {
 					"file-explorer:reveal-active-file"
 				);
 				// apparently the reveal fails sometime
-				setTimeout(async () => {
+				setTimeout(async() => {
 					await (this.app as any).commands.executeCommandById(
 						"file-explorer:reveal-active-file"
 					);
-				}, 50);
-
-				await(this.app as any).commands.executeCommandById(
-					"editor:focus"
-				);
-
-				const titleContainerEl =
-					activeView?.containerEl?.querySelector(
-						".view-header-title"
+					await (this.app as any).commands.executeCommandById(
+						"editor:focus"
 					);
-
-				if (titleContainerEl instanceof HTMLElement) {
-					setTimeout(async () => {
-						titleContainerEl.focus();
-						cmEditor.setCursor(cursor);
-						cmEditor.focus();
-					}, 50);
-				}
+					const titleContainerEl =
+						activeView?.containerEl?.querySelector(
+							".view-header-title"
+						);
+					
+					if (titleContainerEl instanceof HTMLElement) {
+						setTimeout(async() => {
+							titleContainerEl.focus();
+							cmEditor.setCursor(cursor);
+							cmEditor.focus();
+						}, 50);
+					}
+				}, 50);
 			}
 		});
 	};
