@@ -8,3 +8,5 @@ Settings:
 - More options to reveal when opening files
 
 ![demo](demo.jpg)
+
+![demo](reveal.gif)

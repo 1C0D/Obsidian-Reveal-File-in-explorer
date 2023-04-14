@@ -39,6 +39,8 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 						// Update the plugin setting when the toggle is changed
 						this.plugin.settings.foldOtherDirsBefore = value;
 						this.plugin.saveSettings();
+						this.plugin.reveal();
+
 					});
 			});
 
@@ -53,6 +55,7 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 						// Update the plugin setting when the toggle is changed
 						this.plugin.settings.revealOnOpen = value;
 						this.plugin.saveSettings();
+						this.plugin.reveal();
 					});
 			});
 		new Setting(containerEl)
@@ -66,6 +69,7 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 						// Update the plugin setting when the toggle is changed
 						this.plugin.settings.foldWhenOpen = value;
 						this.plugin.saveSettings();
+						this.plugin.reveal();
 					});
 			});
 	}

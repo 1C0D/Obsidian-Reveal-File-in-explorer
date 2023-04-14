@@ -20,6 +20,7 @@ export default class revealExplorerFile extends Plugin {
 		await this.loadSettings();
 		this.addSettingTab(new revealExplorerFileSettingsTab(this.app, this));
 		this.app.workspace.onLayoutReady(() => {
+			// this.registerEvent(
 			this.reveal();
 		});
 	}
