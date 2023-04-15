@@ -47,25 +47,16 @@ export default class revealExplorerFile extends Plugin {
 					"file-explorer:reveal-active-file"
 				);
 				// apparently the reveal fails sometime
-				setTimeout(async() => {
-					await (this.app as any).commands.executeCommandById(
+				setTimeout(async () => {
+					(this.app as any).commands.executeCommandById(
 						"file-explorer:reveal-active-file"
 					);
-					await (this.app as any).commands.executeCommandById(
-						"editor:focus"
-					);
-					const titleContainerEl =
-						activeView?.containerEl?.querySelector(
-							".view-header-title"
-						);
-					
-					if (titleContainerEl instanceof HTMLElement) {
-						setTimeout(async() => {
-							titleContainerEl.focus();
-							cmEditor.setCursor(cursor);
-							cmEditor.focus();
-						}, 50);
-					}
+
+					setTimeout(async () => {
+						this.app.workspace.setActiveLeaf(activeView.leaf, {
+							focus: true,
+						});
+					}, 50);
 				}, 50);
 			}
 		});
@@ -90,9 +81,10 @@ export default class revealExplorerFile extends Plugin {
 
 			const titleContainerEl =
 				activeView?.containerEl?.querySelector(".view-header-title");
-			if (titleContainerEl instanceof HTMLElement) {
-				setTimeout(() => titleContainerEl.focus(), 50);
-			}
+
+			setTimeout(() => {
+				(titleContainerEl as any)?.focus();
+			}, 50);
 		}
 	};
 
