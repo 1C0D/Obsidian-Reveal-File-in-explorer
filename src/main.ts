@@ -32,15 +32,6 @@ export default class revealExplorerFile extends Plugin {
 			if (this.settings.revealOnOpen) {
 				if (!this.is_file_explorer_open()) return;
 				const activeView = workspace.getActiveViewOfType(View);
-				if (
-					!activeView ||
-					!(activeView as any).sourceMode ||
-					!(activeView as any).sourceMode.cmEditor
-				) {
-					return;
-				}
-				const cmEditor = (activeView as any)?.sourceMode.cmEditor;
-				const cursor = cmEditor.getCursor();
 
 				if (this.settings.foldWhenOpen) await this.fold();
 				await (this.app as any).commands.executeCommandById(
@@ -53,7 +44,7 @@ export default class revealExplorerFile extends Plugin {
 					);
 
 					setTimeout(async () => {
-						this.app.workspace.setActiveLeaf(activeView.leaf, {
+						this.app.workspace.setActiveLeaf(activeView!.leaf, {
 							focus: true,
 						});
 					}, 50);
