@@ -5,16 +5,21 @@ interface revealExplorerFileSettings {
 	foldOtherDirsBefore: boolean;
 	revealOnOpen: boolean;
 	foldWhenOpen: boolean;
+	enableExclude: boolean;
+	enableRevealExplorer: boolean;
 }
 
 const DEFAULT_SETTINGS: revealExplorerFileSettings = {
 	foldOtherDirsBefore: true,
 	revealOnOpen: false,
 	foldWhenOpen: false,
+	enableExclude: false,
+	enableRevealExplorer: true
 };
 
 export default class revealExplorerFile extends Plugin {
 	settings: revealExplorerFileSettings;
+	disableRevealExplorer = false
 
 	async onload() {
 		await this.loadSettings();
@@ -26,40 +31,54 @@ export default class revealExplorerFile extends Plugin {
 
 	reveal = () => {
 		const { workspace } = this.app;
-		const containerEl = workspace.containerEl.win; //win to work on multi windows
-		this.registerDomEvent(containerEl, "click", this.clickHandler);
+		const containerEl = workspace.containerEl.win; //win -> multi windows
+		// view-header-title click
+		this.registerDomEvent(containerEl, "click", this.clickHandler, true);//true to intercept event target if click in explorer
+
 		workspace.on("file-open", async () => {
-			if (this.settings.revealOnOpen) {
-				if (!this.is_file_explorer_open()) return;
+			if (this.settings.revealOnOpen && !this.disableRevealExplorer) {
+				if (!this.is_view_explorer_open()) {
+					return;
+				}
 				const activeView = workspace.getActiveViewOfType(View);
 
-				if (this.settings.foldWhenOpen) await this.fold();
-				await (this.app as any).commands.executeCommandById(
-					"file-explorer:reveal-active-file"
-				);
+				if (this.settings.foldWhenOpen) {
+					await this.fold();
+				}
 				// apparently the reveal fails sometime
+				const revealPromise1 = (this.app as any).commands.executeCommandById("file-explorer:reveal-active-file");
+				const revealPromise2 = (this.app as any).commands.executeCommandById("file-explorer:reveal-active-file");
+				await Promise.all([revealPromise1, revealPromise2]);
+				// focus on active leaf
 				setTimeout(async () => {
-					(this.app as any).commands.executeCommandById(
-						"file-explorer:reveal-active-file"
-					);
-
-					setTimeout(async () => {
-						this.app.workspace.setActiveLeaf(activeView!.leaf, {
-							focus: true,
-						});
-					}, 50);
+					this.app.workspace.setActiveLeaf(activeView!.leaf, {
+						focus: true,
+					});
 				}, 50);
+			} else {
+				setTimeout(async () => {
+					this.disableRevealExplorer = false
+				}, 200);
 			}
 		});
 	};
 
 	clickHandler = async (evt: any) => {
-		if (evt.target?.classList.contains("view-header-title")) {
+		const clickedElement = evt.target;
+		const isFileExplorer =
+			clickedElement.classList.contains("tree-item-self")
+			&& clickedElement.classList.contains("nav-file-title")
+			|| clickedElement.classList.contains("tree-item-inner")
+			&& clickedElement.classList.contains("nav-file-title-content")
+
+		if (clickedElement?.classList.contains("view-header-title")) {
 			// don't trigger on New tab
 			const { workspace } = this.app;
 			const activeView = workspace.getActiveViewOfType(View);
 			const isNewTab = activeView?.getDisplayText() === "New tab";
-			if (isNewTab) return;
+			if (isNewTab) {
+				return;
+			}
 
 			if (this.settings.foldOtherDirsBefore) {
 				await this.fold();
@@ -67,15 +86,21 @@ export default class revealExplorerFile extends Plugin {
 			await (this.app as any).commands.executeCommandById(
 				"file-explorer:reveal-active-file"
 			);
-
 			await (this.app as any).commands.executeCommandById("editor:focus");
 
 			const titleContainerEl =
 				activeView?.containerEl?.querySelector(".view-header-title");
-
 			setTimeout(() => {
 				(titleContainerEl as any)?.focus();
 			}, 50);
+		}
+		else if (this.settings.revealOnOpen && !this.settings.enableRevealExplorer && isFileExplorer) {
+			this.disableRevealExplorer = true
+			const { parentElement } = clickedElement;
+			if (parentElement) {
+				const clickEvent = new Event("click");
+				parentElement.dispatchEvent(clickEvent);
+			}
 		}
 	};
 
@@ -84,38 +109,28 @@ export default class revealExplorerFile extends Plugin {
 		const fileExplorer = workspace
 			.getLeavesOfType("file-explorer")
 			?.first();
-		if (!fileExplorer) {
+		// don't trigger on New tab
+		const activeView = workspace.getActiveViewOfType(View);
+		if (activeView?.getDisplayText() === "New tab") {
 			return;
 		}
-		const activeView = workspace.getActiveViewOfType(View);
-		if (activeView?.getDisplayText() === "New tab") return;
 
-		function isFolder(file: TFile | TFolder): file is TFolder {
-			return file instanceof TFolder;
-		}
-		const files = Object.entries((fileExplorer.view as any).fileItems);
+		const files = Object.entries((fileExplorer?.view as any).fileItems);
 		for (const [path, fileItem] of files) {
-			if (path === "/") continue; // don't collapse root
-			// Collapse folder
-			const isFold = isFolder((fileItem as any).file);
+			// don't collapse root
+			if (path === "/") {
+				continue;
+			}
+			// collapse folders
+			const isFold = (fileItem as any).file instanceof TFolder;
 			if (isFold) {
 				await (fileItem as any).setCollapsed(true);
 			}
 		}
 	};
 
-	//seeking for <div class="workspace-tab-header is-active" draggable="true" aria-label="Files" aria-label-delay="300" data-type="file-explorer">
-	// so elts <div> with attr data-type = "file-explorer" and with a class "is-active".
-	// isFileExplorerActive(): boolean {
-	// 	const el = document.querySelector(
-	// 		'div[data-type="file-explorer"].is-active'
-	// 	);
-	// 	return el !== null;
-	// }
-
-	//better https://github.com/shichongrui/obsidian-reveal-active-file/blob/master/main.ts
-	is_file_explorer_open(): boolean {
-		const workspace = this.app.workspace;
+	is_view_explorer_open(): boolean {
+		const { workspace } = this.app;
 		let is_open = false;
 		workspace.iterateAllLeaves((leaf) => {
 			if (
