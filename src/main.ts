@@ -5,15 +5,15 @@ interface revealExplorerFileSettings {
 	foldOtherDirsBefore: boolean;
 	revealOnOpen: boolean;
 	foldWhenOpen: boolean;
-	enableExclude: boolean;
+	// enableExclude: boolean;
 	enableRevealExplorer: boolean;
 }
 
 const DEFAULT_SETTINGS: revealExplorerFileSettings = {
 	foldOtherDirsBefore: true,
-	revealOnOpen: false,
-	foldWhenOpen: false,
-	enableExclude: false,
+	revealOnOpen: true,
+	foldWhenOpen: true,
+	// enableExclude: false,
 	enableRevealExplorer: true
 };
 
