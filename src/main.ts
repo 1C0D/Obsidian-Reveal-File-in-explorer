@@ -34,34 +34,38 @@ export default class revealExplorerFile extends Plugin {
 		const containerEl = workspace.containerEl.win; //win -> multi windows
 		// view-header-title click
 		this.registerDomEvent(containerEl, "click", this.clickHandler, true);//true to intercept event target if click in explorer
-
-		workspace.on("file-open", async () => {
-			if (this.settings.revealOnOpen && !this.disableRevealExplorer) {
-				if (!this.is_view_explorer_open()) {
-					return;
-				}
-				const activeView = workspace.getActiveViewOfType(View);
-
-				if (this.settings.foldWhenOpen) {
-					await this.fold();
-				}
-				// apparently the reveal fails sometime
-				const revealPromise1 = (this.app as any).commands.executeCommandById("file-explorer:reveal-active-file");
-				const revealPromise2 = (this.app as any).commands.executeCommandById("file-explorer:reveal-active-file");
-				await Promise.all([revealPromise1, revealPromise2]);
-				// focus on active leaf
-				setTimeout(async () => {
-					this.app.workspace.setActiveLeaf(activeView!.leaf, {
-						focus: true,
-					});
-				}, 50);
-			} else {
-				setTimeout(async () => {
-					this.disableRevealExplorer = false
-				}, 200);
-			}
-		});
+		this.registerEvent(
+		workspace.on("file-open", this.onFileOpen
+		))
 	};
+
+	onFileOpen = async () => {
+		if (this.settings.revealOnOpen && !this.disableRevealExplorer) {
+			if (!this.is_view_explorer_open()) {
+				return;
+			}
+			const { workspace } = this.app;
+			const activeView = workspace.getActiveViewOfType(View);
+
+			if (this.settings.foldWhenOpen) {
+				await this.fold();
+			}
+			// apparently the reveal fails sometime
+			const revealPromise1 = (this.app as any).commands.executeCommandById("file-explorer:reveal-active-file");
+			const revealPromise2 = (this.app as any).commands.executeCommandById("file-explorer:reveal-active-file");
+			await Promise.all([revealPromise1, revealPromise2]);
+			// focus on active leaf
+			setTimeout(async () => {
+				this.app.workspace.setActiveLeaf(activeView!.leaf, {
+					focus: true,
+				});
+			}, 50);
+		} else {
+			setTimeout(async () => {
+				this.disableRevealExplorer = false
+			}, 200);
+		}
+	}
 
 	clickHandler = async (evt: any) => {
 		const clickedElement = evt.target;
