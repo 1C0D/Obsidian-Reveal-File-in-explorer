@@ -41,12 +41,13 @@ export default class revealExplorerFile extends Plugin {
 
 	onFileOpen = async () => {
 		if (this.settings.revealOnOpen && !this.disableRevealExplorer) {
-			if (!this.is_view_explorer_open()) {
-				return;
-			}
 			const { workspace } = this.app;
 			const activeView = workspace.getActiveViewOfType(View);
-
+			// added a fix on *.table for the plugin Notion like table. bug with the obsidian reveal command
+			if (!this.is_view_explorer_open() || activeView!.leaf.getViewState().state.file?.endsWith(".table")) {
+				return;
+			}
+			
 			if (this.settings.foldWhenOpen) {
 				await this.fold();
 			}
@@ -59,7 +60,8 @@ export default class revealExplorerFile extends Plugin {
 				this.app.workspace.setActiveLeaf(activeView!.leaf, {
 					focus: true,
 				});
-			}, 50);
+			}
+			, 50);
 		} else {
 			setTimeout(async () => {
 				this.disableRevealExplorer = false
@@ -69,6 +71,7 @@ export default class revealExplorerFile extends Plugin {
 
 	clickHandler = async (evt: any) => {
 		const clickedElement = evt.target;
+		// if click on a file in explorer
 		const isFileExplorer =
 			clickedElement.classList.contains("tree-item-self")
 			&& clickedElement.classList.contains("nav-file-title")

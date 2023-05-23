@@ -1,6 +1,6 @@
 {
 	"name": "reveal-file-in-explorer",
-	"version": "1.4.1",
+	"version": "1.4.2",
 	"description": "Clicking header title reveal active file in explorer",
 	"main": "main.js",
 	"scripts": {
