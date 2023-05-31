@@ -158,7 +158,7 @@ export default class revealExplorerFile extends Plugin {
 		const excludedFolders = this.settings.excludedFolders;
 		if (!this.settings.revealOnOpen || !excludedFolders) return false;
 		const newList = excludedFolders.split(",").map(x => x.trim().replace(/^\/+|\/+$/g, "")).filter(x => x !== "");
-		return newList.some(value => path.startsWith(value));
+		return newList.some(value => path?.startsWith(value));
 	}
 
 	async loadSettings() {
