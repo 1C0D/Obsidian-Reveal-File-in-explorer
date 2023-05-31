@@ -6,6 +6,7 @@ interface revealExplorerFileSettings {
 	revealOnOpen: boolean;
 	foldWhenOpen: boolean;
 	// enableExclude: boolean;
+	excludedFolders: string,
 	enableRevealExplorer: boolean;
 }
 
@@ -14,6 +15,7 @@ const DEFAULT_SETTINGS: revealExplorerFileSettings = {
 	revealOnOpen: true,
 	foldWhenOpen: true,
 	// enableExclude: false,
+	excludedFolders: "",
 	enableRevealExplorer: true
 };
 
@@ -35,8 +37,8 @@ export default class revealExplorerFile extends Plugin {
 		// view-header-title click
 		this.registerDomEvent(containerEl, "click", this.clickHandler, true);//true to intercept event target if click in explorer
 		this.registerEvent(
-		workspace.on("file-open", this.onFileOpen
-		))
+			workspace.on("file-open", this.onFileOpen
+			))
 	};
 
 	onFileOpen = async () => {
@@ -44,10 +46,12 @@ export default class revealExplorerFile extends Plugin {
 			const { workspace } = this.app;
 			const activeView = workspace.getActiveViewOfType(View);
 			// added a fix on *.table for the plugin Notion like table. bug with the obsidian reveal command
-			if (!this.is_view_explorer_open() || activeView!.leaf.getViewState().state.file?.endsWith(".table")) {
+			const path = activeView!.leaf.getViewState().state.file
+			console.log("activeView!.leaf.getViewState().state.file", activeView!.leaf.getViewState().state.file)
+			if (!this.is_view_explorer_open() || this.pathIsExcluded(path) || path?.endsWith(".table")) {
 				return;
 			}
-			
+
 			if (this.settings.foldWhenOpen) {
 				await this.fold();
 			}
@@ -61,7 +65,7 @@ export default class revealExplorerFile extends Plugin {
 					focus: true,
 				});
 			}
-			, 50);
+				, 50);
 		} else {
 			setTimeout(async () => {
 				this.disableRevealExplorer = false
@@ -150,15 +154,22 @@ export default class revealExplorerFile extends Plugin {
 		return is_open;
 	}
 
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			await this.loadData()
-		);
+	pathIsExcluded(path: string): boolean {
+		const excludedFolders = this.settings.excludedFolders;
+		if (!this.settings.revealOnOpen || !excludedFolders) return false;
+		const newList = excludedFolders.split(",").map(x => x.trim().replace(/^\/+|\/+$/g, "")).filter(x => x !== "");
+		return newList.some(value => path.startsWith(value));
 	}
 
+	async loadSettings() {
+	this.settings = Object.assign(
+		{},
+		DEFAULT_SETTINGS,
+		await this.loadData()
+	);
+}
+
 	async saveSettings() {
-		await this.saveData(this.settings);
-	}
+	await this.saveData(this.settings);
+}
 }

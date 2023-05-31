@@ -13,3 +13,5 @@ Settings:
 N.B: If you desactivate "Reveal when opening file", other settings below, linked to it, will be hidden
 
 ![demo](reveal.gif)
+
+edit: added an option to exclude some folders from being revealed on opening

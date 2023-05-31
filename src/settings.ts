@@ -54,39 +54,23 @@ export class revealExplorerFileSettingsTab extends PluginSettingTab {
 				"enableRevealExplorer"
 			);
 
-			// option later ?
-			// containerEl.createEl("h3", { text: "File Exclusions" });
-
-			// new Setting(containerEl)
-			// 	.setName("Enable Excluded Directories")
-			// 	.setDesc("")
-			// 	.addToggle((toggle) => {
-			// 		toggle
-			// 			// Create a toggle for the setting
-			// 			.setValue(this.plugin.settings.enableExclude)
-			// 			.onChange((value) => {
-			// 				// Update the plugin setting when the toggle is changed
-			// 				this.plugin.settings.enableExclude = value;
-			// 				this.plugin.saveSettings();
-			// 				this.plugin.reveal();
-			// 			});
-			// 	});
-
-			// new Setting(containerEl)
-			// 	.setName("Excluded Directories on Opening Files")
-			// 	.setDesc("If you want some files not to be revealed when opening them")
-			// 	.addButton(cb => {
-			// 		cb.setButtonText("Manage");
-			// 		cb.onClick((evt: MouseEvent) => {
-			// 			// new ExcludedFilesModal(this.app, this.plugin.settings,
-			// 			// 	async (filters: string[]) => {
-			// 			// 		this.plugin.settings.excludedFilesFilters = filters;
-			// 			// 		await this.plugin.saveSettings();
-			// 			// 		this.display();
-			// 			// 	})
-			// 			// 	.open();
-			// 		})
-			// 	});
+			new Setting(containerEl)
+				.setName("Excluded Folders from reveal on opening")
+				.setDesc(
+					"Comma-separated list of Folders(case sensitive) to exclude from being revealed on opening. " +
+					"You can use 'copy file path' in the palette to get the path, but don't forget to delete the filename from the path. "
+				)
+				.addText((text) =>
+					text
+						.setPlaceholder(
+							"folder/subfolder, folder, ..."
+						)
+						.setValue(this.plugin.settings.excludedFolders)
+						.onChange(async (value) => {
+							this.plugin.settings.excludedFolders = value;
+							await this.plugin.saveSettings();
+						})
+				);
 		}
 	}
 
