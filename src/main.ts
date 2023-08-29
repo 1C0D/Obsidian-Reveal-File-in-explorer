@@ -5,7 +5,6 @@ interface revealExplorerFileSettings {
 	foldOtherDirsBefore: boolean;
 	revealOnOpen: boolean;
 	foldWhenOpen: boolean;
-	// enableExclude: boolean;
 	excludedFolders: string,
 	enableRevealExplorer: boolean;
 }
@@ -14,7 +13,6 @@ const DEFAULT_SETTINGS: revealExplorerFileSettings = {
 	foldOtherDirsBefore: true,
 	revealOnOpen: true,
 	foldWhenOpen: true,
-	// enableExclude: false,
 	excludedFolders: "",
 	enableRevealExplorer: true
 };
@@ -38,19 +36,18 @@ export default class revealExplorerFile extends Plugin {
 		// view-header-title click
 		this.registerDomEvent(containerEl, "click", this.clickHandler, true);//true to intercept event target if click in explorer
 		this.registerEvent(
-			workspace.on("file-open", this.onLeafChange
+			workspace.on("file-open", this.onFileOpen
 			))
 	};
 
-	onLeafChange = async () => {
+	onFileOpen = async () => {
 		if (this.settings.revealOnOpen && !this.disableRevealExplorer) {
 			const { workspace } = this.app;
 			const activeView = workspace.getActiveViewOfType(View);
-			// added a fix on *.table for the plugin Notion like table. bug with the obsidian reveal command
 			const path: string = activeView!.leaf.getViewState().state.file
 			const same = this.oldPath? this.oldPath === path : false
 			this.oldPath = path
-			if (!this.is_view_explorer_open() || this.pathIsExcluded(path) || same) { //path?.endsWith(".table") || 
+			if (!this.is_view_explorer_open() || this.pathIsExcluded(path) || same) {
 				return;
 			}
 
