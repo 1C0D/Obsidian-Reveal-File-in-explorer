@@ -1,7 +1,7 @@
 {
 	"id": "reveal-file-in-explorer",
 	"name": "Reveal file in explorer",
-	"version": "1.5.3",
+	"version": "1.5.4",
 	"minAppVersion": "0.15.0",
 	"description": "Clicking header title reveal active file in explorer",
 	"author": "1C0D",

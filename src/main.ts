@@ -48,7 +48,7 @@ export default class revealExplorerFile extends Plugin {
 			const activeView = workspace.getActiveViewOfType(View);
 			// added a fix on *.table for the plugin Notion like table. bug with the obsidian reveal command
 			const path: string = activeView!.leaf.getViewState().state.file
-			const same = this.oldPath === path
+			const same = this.oldPath? this.oldPath === path : false
 			this.oldPath = path
 			if (!this.is_view_explorer_open() || this.pathIsExcluded(path) || same) { //path?.endsWith(".table") || 
 				return;
