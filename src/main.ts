@@ -37,7 +37,6 @@ export default class revealExplorerFile extends Plugin {
 		const containerEl = workspace.containerEl.win; //win -> multi windows
 		// view-header-title click
 		this.registerDomEvent(containerEl, "click", this.clickHandler, true);//true to intercept event target if click in explorer
-		if (!this.oldPath) this.oldPath = workspace.getActiveViewOfType(View)!.leaf.getViewState().state.file
 		this.registerEvent(
 			workspace.on("file-open", this.onLeafChange
 			))
